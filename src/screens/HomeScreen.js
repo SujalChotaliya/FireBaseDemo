@@ -1,25 +1,53 @@
-//import liraries
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
-// create a component
 const HomeScreen = () => {
+  useEffect(() => {
+    getData();
+  }, []);
+  const [data, setData] = useState();
+  const getData = async () => {
+    try {
+      const usersCollection = await firestore()
+        .collection('TESTING')
+        .doc('U865Oz9ImByIpgXbCeIW')
+        .get();
+
+      setData(usersCollection._data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(data);
   return (
     <View style={styles.container}>
-      <Text>HomeScreen</Text>
+      <Text style={styles.text}>
+        Name : {data ? data.Name : 'Loading.......'}
+      </Text>
+      <Text style={styles.text}>
+        Age : {data ? data.Age : 'Loading.......'}
+      </Text>
+      <Text style={styles.text}>
+        Number : {data ? data.Number : 'Loading.......'}
+      </Text>
+      <Text style={styles.text}>
+        Email : {data ? data.Email : 'Loading.......'}
+      </Text>
+      <Text style={styles.text}>
+        Hobby : {data ? data.Hobby.map(item => ` , ${item}`) : 'Loading.......'}
+      </Text>
     </View>
   );
 };
 
-// define your styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#2c3e50',
   },
+  text: {fontWeight: '500', fontSize: 20, color: 'black'},
 });
 
-//make this component available to the app
 export default HomeScreen;
