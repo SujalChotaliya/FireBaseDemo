@@ -5,6 +5,9 @@ import {View, Text, StyleSheet} from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import RealTimeDB from '../screens/RealTimeDB';
 import Create from '../screens/Create';
+import SignUp from '../screens/SignUp';
+import LoginScreen from '../screens/LoginScreen';
+import Home from '../screens/Home';
 
 const Navigations = () => {
   const Stack = createNativeStackNavigator();
@@ -12,10 +15,13 @@ const Navigations = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{headerShown: false}}
-        initialRouteName="Create">
+        initialRouteName="Home">
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="RealTimeDB" component={RealTimeDB} />
         <Stack.Screen name="Create" component={Create} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -6,16 +6,21 @@ import {
   TextInput,
   Button,
   FlatList,
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import database from '@react-native-firebase/database';
 
 const Create = () => {
   const [task, setTask] = useState();
-  const [name, setname] = useState();
-  const [number, setnumber] = useState();
-  const [email, setemail] = useState();
-  const [password, setpassword] = useState();
   const [data, setData] = useState();
+  const [isUpdateData, setisUpdateData] = useState(false);
+  const [id, setID] = useState();
+  const [index, setIndex] = useState();
+  // const [name, setname] = useState();
+  // const [number, setnumber] = useState();
+  // const [email, setemail] = useState();
+  // const [password, setpassword] = useState();
 
   const getData = async () => {
     try {
@@ -23,8 +28,8 @@ const Create = () => {
         .ref('toDo')
         .on('value', tempData => {
           setData(tempData.val());
+          console.log(tempData);
         });
-      //   console.log(usersCollection);
     } catch (error) {
       console.log(error);
     }
@@ -32,18 +37,19 @@ const Create = () => {
   useEffect(() => {
     getData();
   }, []);
+
   const handleClick = async () => {
     // -------------- TO DO App ---------------
-
     try {
-      const index = data ? data.length : 1;
-      console.log(data ? data : 1);
+      const index1 = data ? data.length : 1;
       const responce = await database()
-        .ref(`toDo/${index}`)
+        .ref(`toDo/${index1}`)
         .set({
           id: Math.floor(Math.random() * (999999999 - 111111111)) + 111111111,
           task: task,
         });
+
+      setTask('');
     } catch (error) {
       console.log(error);
     }
@@ -58,9 +64,34 @@ const Create = () => {
     //   console.log(error);
     // }
   };
+  const handleUpdateData = async () => {
+    try {
+      const responce = await database()
+        .ref(`toDo/${index}`)
+        .update({id: id, task: task});
+      setisUpdateData(false);
+      setTask('');
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const itemClick = (data, index) => {
+    setTask(data.task);
+    setID(data.id);
+    setisUpdateData(true);
+    setIndex(index);
+  };
+
+  const onDelete = async index => {
+    try {
+      await database().ref(`toDo/${index}`).remove();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* -------------- TO DO App --------------- */}
 
       <TextInput
@@ -71,30 +102,38 @@ const Create = () => {
         onChangeText={text => setTask(text)}
       />
 
-      <Button
-        title="Add Task"
-        onPress={() => {
-          handleClick();
-          getData();
-        }}
-      />
+      {!isUpdateData ? (
+        <Button title="Add Task" onPress={() => handleClick()} />
+      ) : (
+        <Button title="Update Task" onPress={() => handleUpdateData()} />
+      )}
+
       <View style={{width: '100%'}}>
         <FlatList
+          bounces={false}
           data={data}
           style={{width: '100%'}}
-          renderItem={({item}) => {
+          renderItem={({item, index}) => {
             if (item != null) {
               return (
-                <View style={styles.view}>
+                <TouchableOpacity
+                  style={styles.view}
+                  onPress={() => itemClick(item, index)}>
                   <Text style={styles.text}>
                     Task :- {item !== null ? item.task : 'Loading.....'}
                   </Text>
-                </View>
+                  <TouchableOpacity
+                    style={{position: 'absolute', right: 10}}
+                    onPress={() => onDelete(index)}>
+                    <Text style={{color: 'red', fontSize: 20}}>D</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
               );
             }
           }}
         />
       </View>
+
       {/* ----------- validation ------------ */}
       {/* <TextInput
         placeholder="Enter Name"
@@ -120,14 +159,13 @@ const Create = () => {
         style={styles.tectin}
         onChangeText={text => setpassword(text)}
       /> */}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   tectin: {
