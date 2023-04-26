@@ -1,17 +1,40 @@
-import {useNavigation} from '@react-navigation/native';
+import {StackActions, useNavigation} from '@react-navigation/native';
 import React, {Component, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, Button, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const {navigate} = useNavigation();
+  const navigation = useNavigation();
 
   const logInClick = async () => {
     try {
-      const responce = await auth().signInWithEmailAndPassword(email, password);
-      navigate('Home');
+      if (email.length > 0 && password.length > 0) {
+        const user = await auth().signInWithEmailAndPassword(email, password);
+        if (user.user.emailVerified) {
+        } else {
+          Alert.alert('Please check link in your gmail!');
+          await auth().currentUser.sendEmailVerification();
+          await auth().signOut();
+          navigation.dispatch(StackActions.replace('Home'));
+        }
+        console.log(user);
+
+        navigation.dispatch(StackActions.replace('Home'));
+      } else {
+        Alert.alert('Please Enter All Data');
+      }
+      //
     } catch (error) {
       if (error.code === 'auth/wrong-password') {
         Alert.alert('This password is invalid!');
@@ -35,13 +58,11 @@ const LoginScreen = () => {
         style={styles.ti}
         onChangeText={text => setPassword(text)}
       />
-
-      <Button
-        title="Login"
-        onPress={() => {
-          logInClick();
-        }}
-      />
+      <TouchableOpacity
+        onPress={() => logInClick()}
+        style={{backgroundColor: 'red'}}>
+        <Text> Login</Text>
+      </TouchableOpacity>
       <Button
         title="Didn't have any account ?"
         onPress={() => navigate('SignUp')}

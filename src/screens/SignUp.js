@@ -13,7 +13,11 @@ const SignUp = () => {
         email,
         password,
       );
-      navigate('Home');
+      await auth().currentUser.sendEmailVerification();
+      await auth().signOut();
+      navigate('LoginScreen');
+      Alert.alert('Check Email inbox');
+      // await navigate('LoginScreen');
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
         Alert.alert('That email address is already in use!');
@@ -67,3 +71,5 @@ const styles = StyleSheet.create({
   },
 });
 export default SignUp;
+
+//jivos37368@jobbrett.com

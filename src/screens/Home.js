@@ -3,20 +3,20 @@ import {View, Text, StyleSheet, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 
-const Home = () => {
-  const {navigate} = useNavigation();
-  auth().onAuthStateChanged(user => {
-    console.log(user);
-    user == null ? navigate('LoginScreen') : null;
-  });
+const Home = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text>Home</Text>
-      <Button title="LogOut" onPress={async () => await auth().signOut()} />
+      <Button
+        title="LogOut"
+        onPress={async () => {
+          await auth().signOut();
+          navigation.navigate('LoginScreen');
+        }}
+      />
     </View>
   );
 };
-0;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
